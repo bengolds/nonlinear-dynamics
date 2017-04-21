@@ -1,0 +1,105 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../range-end-picker/range-end-picker.html">
+
+<dom-module id="variable-slider">
+  <template>
+    <style>
+      :host {
+        display: block;
+        width: 304px;
+        padding-left: 8px;
+        padding-right: 8px;
+        padding-top: 16px;
+      }
+      #card {
+        padding: 8px 8px;
+        width: 100%;
+        display:block;
+        position:relative;
+      }
+      #description {
+        margin: 0px 8px;
+        text-align: center;
+        font-family: Times New Roman;
+        font-style: italic;
+        font-size: 20px;
+      }
+      #slider-container {
+        margin: 0px auto;
+        display: flex;
+        justify-content: center;
+      }
+      #slider {
+        flex-basis: 240px;
+      }
+      #typedInput {
+        text-align: center;
+        margin: 0px auto;
+        width: 160px;
+        --paper-input-container-input: {
+          font-family: Symbola;
+          font-size: 34px;
+        }
+        --paper-input-prefix: {
+          font-family: Times New Roman;
+          font-style: italic;
+          font-size: 34px;
+        }
+      }
+
+    </style>
+
+    <paper-card id='card'>
+      <div id='description'>
+      {{description}}
+      </div>
+      <paper-input id='typedInput' type='number' value='{{value}}' 
+        min="{{min}}" max="{{max}}" step='{{step}}'
+        on-change='inputChanged' no-label-float>
+        <div prefix>{{_getName(name)}}</div>
+      </paper-input>
+      <div id='slider-container'>
+        <range-end-picker value="{{min}}"></range-end-picker>
+        <paper-slider id='slider' step='{{step}}' min="{{min}}" max="{{max}}" immediate-value="{{value}}"></paper-slider>
+        <range-end-picker value="{{max}}"></range-end-picker>
+      </div>
+    </paper-card>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'variable-slider',
+      properties: {
+        name: String,
+        description: String,
+        value: {
+          type: Number,
+          notify: true,
+        },
+        min: Number,
+        max: Number,
+        step: Number
+      },
+
+      attached: function(e) {
+        this.$.slider.value = this.value;
+      },
+
+      inputChanged: function(e) {
+        this.value = Math.min(Math.max(this.min, this.value), this.max);
+        this.$.slider.value = this.value;
+      },
+
+      _getName: function() {
+        if (this.name) {
+          return this.name + ':';
+        }
+        else{
+          return '';
+        }
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,190 @@
+<link rel="import" href="../mathbox-plot/mathbox-plot.html">
+
+<dom-module id="graph-2d">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #mathboxPlot {
+        height:100%;
+      }
+    </style>
+  <mathbox-plot id='mathboxPlot'></mathbox-plot>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'graph-2d',
+
+      properties: {
+        view: {
+          type: Object,
+          readOnly: true
+        },
+        range: {
+          type: Object,
+          value: function() {return {x: [-10, 10], y: [-10, 10] } }
+        },
+        gridLines: Boolean,
+        axisArrows: Boolean,
+        scaleTicks: Boolean,
+        xAxisLabel: String,
+        yAxisLabel: String,
+      },
+
+      ready: function() {
+        let mathbox = this.$.mathboxPlot.mathbox;
+        let view = mathbox.cartesian({}, {
+          range: () => {
+            return this._paddedRange();
+          },
+          scale: () => {
+            return [this.$.mathboxPlot.getAspectRatio(), 1];
+          },
+        });
+        this._setView(view);
+
+        if (this.gridLines) {
+          this._setupGridLines();
+        }
+        if (this.scaleTicks) {
+          this._setupScaleTicks();
+        }
+        if (this.axisArrows) {
+          this._setupAxisArrows();
+        }
+        this._setupAxisLabels();
+      },
+
+      _graphOrigin: function() {
+        return [this.range.x[0], this.range.y[0]];
+      },
+
+      _paddedRange: function() {
+        let padding = 0.08;
+        let xPadding = padding*(this.range.x[1]-this.range.x[0]);
+        let yPadding = padding*(this.range.y[1]-this.range.y[0]);
+        return [
+          [this.range.x[0]-xPadding, this.range.x[1]],
+          [this.range.y[0]-yPadding, this.range.y[1]]
+        ];
+      },
+
+      _setupGridLines: function() {
+        this.view.grid({
+          width: 1,
+          divideX: 20,
+          divideY: 10,
+        });
+      },
+
+      _setupAxisArrows: function() {
+        this.view.axis({
+          axis: 1,
+          width: 2,
+          color: 'black',
+        }, {
+          origin: this._graphOrigin.bind(this),
+        })
+        .axis({
+          axis: 2,
+          width: 2,
+          color: 'black',
+        }, {
+          origin: this._graphOrigin.bind(this),
+        });
+      },
+
+      _setupAxisLabels: function() {
+        this.view.array({
+          channels: 2
+        }, {
+          data: () => {
+            return [
+              [this.range.x[0]+(this.range.x[1]-this.range.x[0])/2, this.range.y[0]],
+            ];
+          }
+        })
+        .text({
+          data: [this.xAxisLabel],
+          font: 'Symbola'
+        })
+        .label({
+          color: 'black',
+          size: 20,
+          offset: [0,-35]
+        });
+
+        this.view.array({
+          channels: 2
+        }, {
+          data: () => {
+            return [
+              [this.range.x[0], this.range.y[0]+(this.range.y[1]-this.range.y[0])/2],
+            ];
+          }
+        })
+        .text({
+          data: [this.yAxisLabel],
+          font: 'Symbola'
+        })
+        .label({
+          color: 'black',
+          size: 20,
+          offset: [-55,0]
+        });
+
+      },
+
+      _setupScaleTicks: function() {
+        this.view.scale({
+          divide: 10,
+          axis: 2,
+          start: false,
+          end: false,
+        }, {
+          origin: this._graphOrigin.bind(this),
+        })
+        .ticks({
+          width: 1,
+          size: 15,
+          color: 'black',
+        })
+        .format({
+          digits: 2,
+          font: 'Symbola',
+          weight: 'bold'
+        })
+        .label({
+          color: 'black',
+          zIndex: 1,
+          offset: [-25, 0]
+        });
+
+        this.view.scale({
+          divide: 10,
+          axis: 1,
+          start: false,
+          end: false,
+        }, {
+          origin: this._graphOrigin.bind(this),
+        })
+        .ticks({
+          width: 1,
+          size: 15,
+          color: 'black',
+        })
+        .format({
+          digits: 2,
+          font: 'Symbola',
+          weight: 'bold'
+        })
+        .label({
+          color: 'black',
+          zIndex: 1,
+        });
+      },
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../mathbox-plot/mathbox-plot.html">
+<link rel="import" href="../variable-slider/variable-slider.html">
+
+<dom-module id="logistic-map">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #plot-container {
+        display: flex;
+        justify-content: center;
+        height: 640px;
+      }
+      #graph {
+        flex-basis: 800px;
+        max-width: 800px;
+      }
+      #sliders {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+    <div id='plot-container'>
+      <graph-2d id='graph' range='{{range}}' 
+      x-axis-label='n'
+      y-axis-label='x'
+      scale-ticks axis-arrows></graph-2d>
+    </div>
+    <div id='sliders'>
+      <variable-slider name='r' value='{{r}}' min='0' max='4' step='0.01'></variable-slider>
+      <variable-slider name='x₀' value='{{x0}}' min='0' max='1' step='0.01'></variable-slider>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'logistic-map',
+
+      properties: {
+        r: {
+          type: Number,
+          value: 2
+        },
+        range: {
+          type: Object,
+          value: function() {
+            return {
+              x: [0, 500],
+              y: [0, 1]
+            };
+          }
+        },
+        x0: {
+          type: Number,
+          value: 0.2
+        }
+      },
+
+      attached: function() {
+        let view = this.$.graph.view;
+        view.array({
+          width: this.range.x[1],
+          channels: 2,
+          expr: function(emit, i) {
+            emit(i, this.logistic(i));
+          }.bind(this)
+        })
+        .point({
+          color: 'red',
+        });
+        view.inspect();
+      },
+
+      logistic: function(i) {
+        if (i == 0) {
+          return this.x0;
+        }
+        else {
+          let x = this.logistic(i-1);
+          return this.r * x * (1-x);
+        }
+      }
+
+    });
+  </script>
+</dom-module>

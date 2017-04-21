@@ -1,0 +1,141 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../graph-2d/graph-2d.html">
+<link rel="import" href="../variable-slider/variable-slider.html">
+
+<dom-module id="bifurcation-diagram">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #plot-container {
+        /*display: flex;*/
+        /*justify-content: center;*/
+        /*height: 640px;*/
+      }
+      #graph {
+/*        flex-basis: 800px;
+        flex-grow: 1;
+        flex-shrink: 1;
+*/        /*max-width: 800px;*/
+        height: 640px;
+        width: 100%;
+      }
+      #sliders {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    </style>
+    <div id='plot-container'>
+      <graph-2d id='graph' range='{{getRange(rmin)}}' 
+      x-axis-label='x'
+      y-axis-label='r'
+      scale-ticks axis-arrows></graph-2d>
+    </div>
+    <div id='sliders'>
+      <variable-slider name='x₀' value='{{x0}}' min='0' max='1' step='0.01'></variable-slider>
+      <variable-slider name='rₘᵢₙ' value='{{rmin}}' min='0' max='4' step='0.01'></variable-slider>
+      <variable-slider description='Iterates to skip before plotting' value='{{skip}}' min='0' max='300' step='1'></variable-slider>
+      <variable-slider description='Number of values of r to plot' value='{{xSamples}}' min='1' max='1000' step='1'></variable-slider>
+      <variable-slider description='Number of points to sample per value of r' value='{{ySamples}}' min='1' max='300' step='1'></variable-slider>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'bifurcation-diagram',
+
+      properties: {
+        x0: {
+          type: Number,
+          value: 0.2
+        },
+        rmin: {
+          type: Number,
+          value: 1.5
+        },
+        skip: {
+          type: Number,
+          value: 100,
+        },
+        xSamples: {
+          type: Number,
+          value: 400
+        },
+        ySamples: {
+          type: Number,
+          value: 100
+        }
+      },
+
+      getRange: function() {
+        return {
+          x: [this.rmin, 4],
+          y: [0, 1]
+        };
+      },
+
+      attached: function() {
+        let view = this.$.graph.view;
+
+        /*
+        * memoize.js
+        * by @philogb and @addyosmani
+        * with further optimizations by @mathias
+        * and @DmitryBaranovsk
+        * perf tests: http://bit.ly/q3zpG3
+        * Released under an MIT license.
+        */
+        function memoize( fn ) {
+          return function () {
+            var args = Array.prototype.slice.call(arguments),
+            hash = "",
+            i = args.length;
+            currentArg = null;
+            while (i--) {
+              currentArg = args[i];
+              hash += (currentArg === Object(currentArg)) ?
+              JSON.stringify(currentArg) : currentArg;
+              fn.memoize || (fn.memoize = {});
+            }
+            return (hash in fn.memoize) ? fn.memoize[hash] :
+            fn.memoize[hash] = fn.apply(this, args);
+          };
+        }
+
+        function logistic (i, r, x0) {
+          if (i <= 0 || Number.isNaN(i)) {
+            return x0;
+          }
+          else {
+            let x = logistic(i-1, r, x0);
+            return r * x * (1-x);
+          }
+        }
+        let memoizedLogistic = memoize(logistic);
+        // let memoizedLogistic = logistic;
+        
+        view.area({
+          channels: 2,
+          expr: (emit, x, y, i, j) => {
+            let val = memoizedLogistic(this.skip+j, x, this.x0);
+            emit(x, val);
+          }
+        }, {
+          width: () => {return this.xSamples;},
+          height: () => {return this.ySamples;},
+          bufferWidth: () => {return this.xSamples;},
+          bufferHeight: () => {return this.ySamples;},
+          rangeX: () => {return this.getRange().x;},
+        })
+        .point({
+          color: 'red',
+          size: 1
+        });
+      },
+
+    });
+  </script>
+</dom-module>
