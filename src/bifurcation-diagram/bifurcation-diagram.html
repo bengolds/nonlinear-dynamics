@@ -29,7 +29,7 @@
     </style>
     <div id='plot-container'>
       <graph-2d id='graph' range='{{getRange(rmin)}}' 
-      x-axis-label='x'
+      x-axis-label='r'
       y-axis-label='r'
       scale-ticks axis-arrows></graph-2d>
     </div>
@@ -37,8 +37,8 @@
       <variable-slider name='x₀' value='{{x0}}' min='0' max='1' step='0.01'></variable-slider>
       <variable-slider name='rₘᵢₙ' value='{{rmin}}' min='0' max='4' step='0.01'></variable-slider>
       <variable-slider description='Iterates to skip before plotting' value='{{skip}}' min='0' max='300' step='1'></variable-slider>
-      <variable-slider description='Number of values of r to plot' value='{{xSamples}}' min='1' max='1000' step='1'></variable-slider>
-      <variable-slider description='Number of points to sample per value of r' value='{{ySamples}}' min='1' max='300' step='1'></variable-slider>
+      <variable-slider description='Number of samples of r to plot' value='{{xSamples}}' min='1' max='1000' step='1'></variable-slider>
+      <variable-slider description='Number of iterations to plot per value of r' value='{{ySamples}}' min='1' max='300' step='1'></variable-slider>
     </div>
   </template>
 
@@ -114,8 +114,8 @@
             return r * x * (1-x);
           }
         }
-        let memoizedLogistic = memoize(logistic);
-        // let memoizedLogistic = logistic;
+        // let memoizedLogistic = memoize(logistic);
+        let memoizedLogistic = logistic;
         
         view.area({
           channels: 2,
@@ -134,6 +134,12 @@
           color: 'red',
           size: 1
         });
+
+        let printSkip = () => {
+          console.log(typeof this.skip);
+          window.requestAnimationFrame(printSkip);
+        };
+        printSkip();
       },
 
     });

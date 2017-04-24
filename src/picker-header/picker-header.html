@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="picker-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+        height:40px;
+        width:100%;
+        margin-bottom: 8px;
+      }
+      #panel {
+        background-color: lightblue;
+        height:100%;
+      }
+
+    </style>
+    <div id='panel'>
+      <a href='../logistic-map/'>Logistic Map</a>
+      <a href='../bifurcation-diagram/'>Bifurcation Diagram</a>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'picker-header'
+    });
+  </script>
+</dom-module>

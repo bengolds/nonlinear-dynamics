@@ -85,10 +85,10 @@
       attached: function() {
         //For some reason, initializing the mathbox changes the width,
         //so we need to do this again after the setup
-        this.resize();
         new ResizeSensor(this.$.mathbox, () => {
           this.resize();
         });
+        this.resize();
 
         this.classList.add('ungrabbed');
       },
@@ -116,6 +116,7 @@
       resize: function() {
         if (!this.initialized)
           return;
+       console.log('resizing!'); 
 
         this.mathbox.three.Size.set({
           width: this.offsetWidth,

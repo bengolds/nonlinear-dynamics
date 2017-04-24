@@ -55,7 +55,7 @@
       <div id='description'>
       {{description}}
       </div>
-      <paper-input id='typedInput' type='number' value='{{value}}' 
+      <paper-input id='typedInput' type='number' value='[[value]]' 
         min="{{min}}" max="{{max}}" step='{{step}}'
         on-change='inputChanged' no-label-float>
         <div prefix>{{_getName(name)}}</div>
@@ -88,7 +88,7 @@
       },
 
       inputChanged: function(e) {
-        this.value = Math.min(Math.max(this.min, this.value), this.max);
+        this.value = Math.min(Math.max(this.min, this.$.typedInput.value), this.max);
         this.$.slider.value = this.value;
       },
 

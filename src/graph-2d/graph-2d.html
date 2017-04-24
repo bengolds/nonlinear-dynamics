@@ -5,12 +5,23 @@
     <style>
       :host {
         display: block;
+        height:100%;
+        width: 100%;
+        max-width: 800px;
       }
       #mathboxPlot {
+        height: 100%;
+        width: 100%;
+      }
+      #debug {
+        display: none;
         height:100%;
+        width: 100%;
+        background-color: red;
       }
     </style>
-  <mathbox-plot id='mathboxPlot'></mathbox-plot>
+    <div id='debug'></div>
+    <mathbox-plot id='mathboxPlot'></mathbox-plot>
   </template>
 
   <script>
